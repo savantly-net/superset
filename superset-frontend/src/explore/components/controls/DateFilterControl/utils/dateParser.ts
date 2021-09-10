@@ -22,6 +22,8 @@ import {
   CustomRangeType,
   DateTimeGrainType,
   DateTimeModeType,
+  SimpleRangeDecodeType,
+  SimpleRangeType,
 } from 'src/explore/components/controls/DateFilterControl/types';
 import { SEPARATOR } from './dateFilterUtils';
 import { SEVEN_DAYS_AGO, MIDNIGHT, MOMENT_FORMAT } from './constants';
@@ -35,11 +37,16 @@ import { SEVEN_DAYS_AGO, MIDNIGHT, MOMENT_FORMAT } from './constants';
  * @see: https://www.w3.org/TR/NOTE-datetime
  */
 const iso8601 = String.raw`\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(?:\.\d+)?(?:(?:[+-]\d\d:\d\d)|Z)?`;
+const iso8601ZeroTime = String.raw`\d{4}-\d\d-\d\dT00:00:00(?:\.0+)?(?:(?:[+-]00:00)|Z)?`;
 const datetimeConstant = String.raw`TODAY|NOW`;
 const grainValue = String.raw`[+-]?[1-9][0-9]*`;
 const grain = String.raw`YEAR|QUARTER|MONTH|WEEK|DAY|HOUR|MINUTE|SECOND`;
 const CUSTOM_RANGE_EXPRESSION = RegExp(
   String.raw`^DATEADD\(DATETIME\("(${iso8601}|${datetimeConstant})"\),\s(${grainValue}),\s(${grain})\)$`,
+  'i',
+);
+export const ISO8601_ZERO_TIME_CONSTANT = RegExp(
+  String.raw`^${iso8601ZeroTime}$`,
   'i',
 );
 export const ISO8601_AND_CONSTANT = RegExp(
@@ -59,6 +66,10 @@ const defaultCustomRange: CustomRangeType = {
   anchorMode: 'now',
   anchorValue: 'now',
 };
+const defaultSimpleRange: SimpleRangeType = {
+  sinceDatetime: SEVEN_DAYS_AGO,
+  untilDatetime: MIDNIGHT
+};
 const SPECIFIC_MODE = ['specific', 'today', 'now'];
 
 export const dttmToMoment = (dttm: string): Moment => {
@@ -74,6 +85,39 @@ export const dttmToMoment = (dttm: string): Moment => {
 export const dttmToString = (dttm: string): string =>
   dttmToMoment(dttm).format(MOMENT_FORMAT);
 
+export const simpleTimeRangeDecode = (
+  timeRange: string,
+): SimpleRangeDecodeType => {
+  const splitDateRange = timeRange.split(SEPARATOR);
+
+  if (splitDateRange.length === 2) {
+    const [since, until] = splitDateRange;
+
+    // both are ISO8601 and start of day
+    if (ISO8601_ZERO_TIME_CONSTANT.test(since) && ISO8601_ZERO_TIME_CONSTANT.test(until)) {
+      return {
+        simpleRange: {
+          sinceDatetime: since,
+          untilDatetime: until
+        },
+        matchedFlag: true
+      };
+    }
+  }
+
+  return {
+    simpleRange: defaultSimpleRange,
+    matchedFlag: false
+  };
+};
+
+export const simpleTimeRangeEncode = (simpleRange: SimpleRangeType): string => {
+  const {sinceDatetime, untilDatetime} = simpleRange;
+  const since = dttmToString(sinceDatetime);
+  const until = dttmToString(untilDatetime);
+  return `${since} : ${until}`;
+}
+  
 export const customTimeRangeDecode = (
   timeRange: string,
 ): CustomRangeDecodeType => {

@@ -22,6 +22,7 @@ export type SelectOptionType = {
 };
 
 export type FrameType =
+  | 'Simple'
   | 'Common'
   | 'Calendar'
   | 'Custom'
@@ -50,6 +51,10 @@ export type CustomRangeKey =
   | 'anchorMode'
   | 'anchorValue';
 
+export type SimpleRangeKey =
+  | 'sinceDatetime'
+  | 'untilDatetime';
+
 export type DateTimeModeType = 'specific' | 'relative' | 'now' | 'today';
 
 export type CustomRangeType = {
@@ -67,6 +72,16 @@ export type CustomRangeType = {
 
 export type CustomRangeDecodeType = {
   customRange: CustomRangeType;
+  matchedFlag: boolean;
+};
+
+export type SimpleRangeType = {
+  sinceDatetime: string;
+  untilDatetime: string;
+};
+
+export type SimpleRangeDecodeType = {
+  simpleRange: SimpleRangeType;
   matchedFlag: boolean;
 };
 
