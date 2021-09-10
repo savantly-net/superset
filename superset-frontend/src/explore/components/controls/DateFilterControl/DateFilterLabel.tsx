@@ -26,6 +26,7 @@ import {
   CALENDAR_RANGE_VALUES_SET,
   FRAME_OPTIONS,
   customTimeRangeDecode,
+  simpleTimeRangeDecode,
 } from 'src/explore/components/controls/DateFilterControl/utils';
 import { getClientErrorObject } from 'src/utils/getClientErrorObject';
 import Button from 'src/components/Button';
@@ -48,6 +49,7 @@ import {
   CalendarFrame,
   CustomFrame,
   AdvancedFrame,
+  SimpleFrame,
 } from './components';
 
 const guessFrame = (timeRange: string): FrameType => {
@@ -59,6 +61,9 @@ const guessFrame = (timeRange: string): FrameType => {
   }
   if (timeRange === 'No filter') {
     return 'No filter';
+  }
+  if (simpleTimeRangeDecode(timeRange).matchedFlag) {
+    return 'Simple';
   }
   if (customTimeRangeDecode(timeRange).matchedFlag) {
     return 'Custom';
@@ -309,6 +314,9 @@ export default function DateFilterLabel(props: DateFilterControlProps) {
       )}
       {frame === 'Custom' && (
         <CustomFrame value={timeRangeValue} onChange={setTimeRangeValue} />
+      )}
+      {frame === 'Simple' && (
+        <SimpleFrame value={timeRangeValue} onChange={setTimeRangeValue} />
       )}
       {frame === 'No filter' && <div data-test="no-filter" />}
       <Divider />
