@@ -58,6 +58,7 @@ const propTypes = {
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   overrides: PropTypes.object,
   show: PropTypes.bool,
+  showLabel: PropTypes.bool,
   titleColumn: PropTypes.string,
   descriptionColumns: PropTypes.arrayOf(PropTypes.string),
   timeColumn: PropTypes.string,
@@ -70,8 +71,6 @@ const propTypes = {
   addAnnotationLayer: PropTypes.func,
   removeAnnotationLayer: PropTypes.func,
   close: PropTypes.func,
-
-  onPopoverClear: PropTypes.func,
 };
 
 const defaultProps = {
@@ -87,6 +86,7 @@ const defaultProps = {
   overrides: {},
   colorScheme: 'd3Category10',
   show: true,
+  showLabel: false,
   titleColumn: '',
   descriptionColumns: [],
   timeColumn: '',
@@ -95,7 +95,6 @@ const defaultProps = {
   addAnnotationLayer: () => {},
   removeAnnotationLayer: () => {},
   close: () => {},
-  onPopoverClear: () => {},
 };
 
 export default class AnnotationLayer extends React.PureComponent {
@@ -114,6 +113,7 @@ export default class AnnotationLayer extends React.PureComponent {
       value,
       overrides,
       show,
+      showLabel,
       titleColumn,
       descriptionColumns,
       timeColumn,
@@ -145,6 +145,7 @@ export default class AnnotationLayer extends React.PureComponent {
       value,
       overrides,
       show,
+      showLabel,
       // slice
       titleColumn,
       descriptionColumns,
@@ -167,12 +168,10 @@ export default class AnnotationLayer extends React.PureComponent {
     this.applyAnnotation = this.applyAnnotation.bind(this);
     this.fetchOptions = this.fetchOptions.bind(this);
     this.handleAnnotationType = this.handleAnnotationType.bind(this);
-    this.handleAnnotationSourceType = this.handleAnnotationSourceType.bind(
-      this,
-    );
+    this.handleAnnotationSourceType =
+      this.handleAnnotationSourceType.bind(this);
     this.handleValue = this.handleValue.bind(this);
     this.isValidForm = this.isValidForm.bind(this);
-    this.popoverClearWrapper = this.popoverClearWrapper.bind(this);
   }
 
   componentDidMount() {
@@ -238,15 +237,6 @@ export default class AnnotationLayer extends React.PureComponent {
     return !errors.filter(x => x).length;
   }
 
-  popoverClearWrapper(value, actionMeta, callback) {
-    if (callback) {
-      callback(value);
-    }
-    if (actionMeta?.action === 'clear') {
-      this.props.onPopoverClear(true);
-    }
-  }
-
   handleAnnotationType(annotationType) {
     this.setState({
       annotationType,
@@ -266,7 +256,7 @@ export default class AnnotationLayer extends React.PureComponent {
   handleValue(value) {
     this.setState({
       value,
-      descriptionColumns: null,
+      descriptionColumns: [],
       intervalEndColumn: null,
       timeColumn: null,
       titleColumn: null,
@@ -337,6 +327,7 @@ export default class AnnotationLayer extends React.PureComponent {
         'value',
         'overrides',
         'show',
+        'showLabel',
         'titleColumn',
         'descriptionColumns',
         'timeColumn',
@@ -409,6 +400,7 @@ export default class AnnotationLayer extends React.PureComponent {
     if (requiresQuery(sourceType)) {
       return (
         <SelectControl
+          ariaLabel={t('Annotation layer value')}
           name="annotation-layer-value"
           showHeader
           hovered
@@ -418,9 +410,7 @@ export default class AnnotationLayer extends React.PureComponent {
           options={valueOptions}
           isLoading={isLoadingOptions}
           value={value}
-          onChange={(value, _, actionMeta) =>
-            this.popoverClearWrapper(value, actionMeta, this.handleValue)
-          }
+          onChange={this.handleValue}
           validationErrors={!value ? ['Mandatory'] : []}
           optionRenderer={this.renderOption}
         />
@@ -479,14 +469,17 @@ export default class AnnotationLayer extends React.PureComponent {
             {(annotationType === ANNOTATION_TYPES.EVENT ||
               annotationType === ANNOTATION_TYPES.INTERVAL) && (
               <SelectControl
+                ariaLabel={t('Annotation layer time column')}
                 hovered
                 name="annotation-layer-time-column"
                 label={
                   annotationType === ANNOTATION_TYPES.INTERVAL
-                    ? 'Interval start column'
-                    : 'Event time column'
+                    ? t('Interval start column')
+                    : t('Event time column')
                 }
-                description="This column must contain date/time information."
+                description={t(
+                  'This column must contain date/time information.',
+                )}
                 validationErrors={!timeColumn ? ['Mandatory'] : []}
                 clearable={false}
                 options={timeColumnOptions}
@@ -496,48 +489,42 @@ export default class AnnotationLayer extends React.PureComponent {
             )}
             {annotationType === ANNOTATION_TYPES.INTERVAL && (
               <SelectControl
+                ariaLabel={t('Annotation layer interval end')}
                 hovered
                 name="annotation-layer-intervalEnd"
-                label="Interval End column"
-                description="This column must contain date/time information."
+                label={t('Interval End column')}
+                description={t(
+                  'This column must contain date/time information.',
+                )}
                 validationErrors={!intervalEndColumn ? ['Mandatory'] : []}
                 options={columns}
                 value={intervalEndColumn}
-                onChange={(value, _, actionMeta) =>
-                  this.popoverClearWrapper(value, actionMeta, v =>
-                    this.setState({ intervalEndColumn: v }),
-                  )
-                }
+                onChange={value => this.setState({ intervalEndColumn: value })}
               />
             )}
             <SelectControl
+              ariaLabel={t('Annotation layer title column')}
               hovered
               name="annotation-layer-title"
-              label="Title Column"
-              description="Pick a title for you annotation."
+              label={t('Title Column')}
+              description={t('Pick a title for you annotation.')}
               options={[{ value: '', label: 'None' }].concat(columns)}
               value={titleColumn}
-              onChange={(value, _, actionMeta) =>
-                this.popoverClearWrapper(value, actionMeta, v =>
-                  this.setState({ titleColumn: v }),
-                )
-              }
+              onChange={value => this.setState({ titleColumn: value })}
             />
             {annotationType !== ANNOTATION_TYPES.TIME_SERIES && (
               <SelectControl
+                ariaLabel={t('Annotation layer description columns')}
                 hovered
                 name="annotation-layer-title"
-                label="Description Columns"
-                description={`Pick one or more columns that should be shown in the
-                  annotation. If you don't select a column all of them will be shown.`}
+                label={t('Description Columns')}
+                description={t(
+                  "Pick one or more columns that should be shown in the annotation. If you don't select a column all of them will be shown.",
+                )}
                 multi
                 options={columns}
                 value={descriptionColumns}
-                onChange={(value, _, actionMeta) =>
-                  this.popoverClearWrapper(value, actionMeta, v =>
-                    this.setState({ descriptionColumns: v }),
-                  )
-                }
+                onChange={value => this.setState({ descriptionColumns: value })}
               />
             )}
             <div style={{ marginTop: '1rem' }}>
@@ -629,6 +616,7 @@ export default class AnnotationLayer extends React.PureComponent {
         info={t('Configure your how you overlay is displayed here.')}
       >
         <SelectControl
+          ariaLabel={t('Annotation layer stroke')}
           name="annotation-layer-stroke"
           label={t('Style')}
           // see '../../../visualizations/nvd3_vis.css'
@@ -643,6 +631,7 @@ export default class AnnotationLayer extends React.PureComponent {
           onChange={v => this.setState({ style: v })}
         />
         <SelectControl
+          ariaLabel={t('Annotation layer opacity')}
           name="annotation-layer-opacity"
           label={t('Opacity')}
           // see '../../../visualizations/nvd3_vis.css'
@@ -653,11 +642,7 @@ export default class AnnotationLayer extends React.PureComponent {
             { value: 'opacityHigh', label: '0.8' },
           ]}
           value={opacity}
-          onChange={(value, _, actionMeta) =>
-            this.popoverClearWrapper(value, actionMeta, v =>
-              this.setState({ opacity: v }),
-            )
-          }
+          onChange={value => this.setState({ opacity: value })}
         />
         <div>
           <ControlHeader label={t('Color')} />
@@ -709,7 +694,8 @@ export default class AnnotationLayer extends React.PureComponent {
   }
 
   render() {
-    const { isNew, name, annotationType, sourceType, show } = this.state;
+    const { isNew, name, annotationType, sourceType, show, showLabel } =
+      this.state;
     const isValid = this.isValidForm();
     const metadata = getChartMetadataRegistry().get(this.props.vizType);
     const supportedAnnotationTypes = metadata
@@ -745,7 +731,16 @@ export default class AnnotationLayer extends React.PureComponent {
                 value={!show}
                 onChange={v => this.setState({ show: !v })}
               />
+              <CheckboxControl
+                name="annotation-label-show"
+                label={t('Show label')}
+                value={showLabel}
+                hovered
+                description={t('Whether to always show the annotation label')}
+                onChange={v => this.setState({ showLabel: v })}
+              />
               <SelectControl
+                ariaLabel={t('Annotation layer type')}
                 hovered
                 description={t('Choose the annotation layer type')}
                 label={t('Annotation layer type')}
@@ -757,19 +752,14 @@ export default class AnnotationLayer extends React.PureComponent {
               />
               {supportedSourceTypes.length > 0 && (
                 <SelectControl
+                  ariaLabel={t('Annotation source type')}
                   hovered
-                  description="Choose the source of your annotations"
-                  label="Annotation Source"
+                  description={t('Choose the source of your annotations')}
+                  label={t('Annotation Source')}
                   name="annotation-source-type"
                   options={supportedSourceTypes}
                   value={sourceType}
-                  onChange={(value, _, actionMeta) =>
-                    this.popoverClearWrapper(
-                      value,
-                      actionMeta,
-                      this.handleAnnotationSourceType,
-                    )
-                  }
+                  onChange={this.handleAnnotationSourceType}
                   validationErrors={!sourceType ? [t('Mandatory')] : []}
                 />
               )}

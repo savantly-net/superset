@@ -18,6 +18,7 @@
  */
 
 import { useCallback, useEffect } from 'react';
+import { omit } from 'lodash';
 /* eslint camelcase: 0 */
 import URI from 'urijs';
 import {
@@ -98,6 +99,7 @@ export function getExploreLongUrl(
   endpointType,
   allowOverflow = true,
   extraSearch = {},
+  force = false,
 ) {
   if (!formData.datasource) {
     return null;
@@ -111,6 +113,9 @@ export function getExploreLongUrl(
   });
   search.form_data = safeStringify(formData);
   if (endpointType === URL_PARAMS.standalone.name) {
+    if (force) {
+      search.force = '1';
+    }
     search.standalone = DashboardStandaloneMode.HIDE_NAV;
   }
   const url = uri.directory(directory).search(search).toString();
@@ -119,11 +124,30 @@ export function getExploreLongUrl(
       datasource: formData.datasource,
       viz_type: formData.viz_type,
     };
-    return getExploreLongUrl(minimalFormData, endpointType, false, {
-      URL_IS_TOO_LONG_TO_SHARE: null,
-    });
+    return getExploreLongUrl(
+      minimalFormData,
+      endpointType,
+      false,
+      {
+        URL_IS_TOO_LONG_TO_SHARE: null,
+      },
+      force,
+    );
   }
   return url;
+}
+
+export function getExploreUrlFromDashboard(formData) {
+  // remove formData params that we don't need in the explore url.
+  // These are present when generating explore urls from the dashboard page.
+  // This should be superseded by some sort of "exploration context" system
+  // where form data and other context is referenced by id.
+  const trimmedFormData = omit(formData, [
+    'dataMask',
+    'url_params',
+    'label_colors',
+  ]);
+  return getExploreLongUrl(trimmedFormData, null, false);
 }
 
 export function getChartDataUri({ path, qs, allowDomainSharding = false }) {
@@ -159,6 +183,11 @@ export function getExploreUrl({
   if (!formData.datasource) {
     return null;
   }
+
+  // label_colors should not pollute the URL
+  // eslint-disable-next-line no-param-reassign
+  delete formData.label_colors;
+
   let uri = getChartDataUri({ path: '/', allowDomainSharding });
   if (curUrl) {
     uri = URI(URI(curUrl).search());

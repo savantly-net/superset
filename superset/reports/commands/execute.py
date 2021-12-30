@@ -28,6 +28,7 @@ from sqlalchemy.orm import Session
 from superset import app
 from superset.commands.base import BaseCommand
 from superset.commands.exceptions import CommandException
+from superset.common.chart_data import ChartDataResultFormat, ChartDataResultType
 from superset.extensions import feature_flag_manager, machine_auth_provider_factory
 from superset.models.reports import (
     ReportDataFormat,
@@ -64,7 +65,6 @@ from superset.reports.notifications import create_notification
 from superset.reports.notifications.base import NotificationContent
 from superset.reports.notifications.exceptions import NotificationError
 from superset.utils.celery import session_scope
-from superset.utils.core import ChartDataResultFormat, ChartDataResultType
 from superset.utils.csv import get_chart_csv_data, get_chart_dataframe
 from superset.utils.screenshots import (
     BaseScreenshot,
@@ -72,6 +72,7 @@ from superset.utils.screenshots import (
     DashboardScreenshot,
 )
 from superset.utils.urls import get_url_path
+from superset.utils.webdriver import DashboardStandaloneMode
 
 logger = logging.getLogger(__name__)
 
@@ -145,27 +146,34 @@ class BaseReportState:
         """
         Get the url for this report schedule: chart or dashboard
         """
+        force = "true" if self._report_schedule.force_screenshot else "false"
+
         if self._report_schedule.chart:
             if result_format in {
                 ChartDataResultFormat.CSV,
                 ChartDataResultFormat.JSON,
             }:
                 return get_url_path(
-                    "ChartRestApi.get_data",
+                    "ChartDataRestApi.get_data",
                     pk=self._report_schedule.chart_id,
                     format=result_format.value,
                     type=ChartDataResultType.POST_PROCESSED.value,
+                    force=force,
                 )
             return get_url_path(
-                "Superset.slice",
+                "Superset.explore",
                 user_friendly=user_friendly,
-                slice_id=self._report_schedule.chart_id,
+                form_data=json.dumps({"slice_id": self._report_schedule.chart_id}),
+                standalone="true",
+                force=force,
                 **kwargs,
             )
         return get_url_path(
             "Superset.dashboard",
             user_friendly=user_friendly,
             dashboard_id_or_slug=self._report_schedule.dashboard_id,
+            standalone=DashboardStandaloneMode.REPORT.value,
+            # force=force,  TODO (betodealmeida) implement this
             **kwargs,
         )
 
@@ -187,7 +195,7 @@ class BaseReportState:
         """
         screenshot: Optional[BaseScreenshot] = None
         if self._report_schedule.chart:
-            url = self._get_url(standalone="true")
+            url = self._get_url()
             logger.info("Screenshotting chart at %s", url)
             screenshot = ChartScreenshot(
                 url,

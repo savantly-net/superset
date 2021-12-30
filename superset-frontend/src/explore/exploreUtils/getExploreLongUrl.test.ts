@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { getExploreLongUrl } from '.';
+import { getExploreLongUrl, getExploreUrlFromDashboard } from '.';
 
 const createParams = () => ({
   formData: {
@@ -45,12 +45,27 @@ test('Get url when endpointType:standalone', () => {
   expect(
     getExploreLongUrl(
       params.formData,
-      params.endpointType,
+      'standalone',
       params.allowOverflow,
       params.extraSearch,
     ),
   ).toBe(
-    '/superset/explore/?same=any-string&form_data=%7B%22datasource%22%3A%22datasource%22%2C%22viz_type%22%3A%22viz_type%22%7D',
+    '/superset/explore/?same=any-string&form_data=%7B%22datasource%22%3A%22datasource%22%2C%22viz_type%22%3A%22viz_type%22%7D&standalone=1',
+  );
+});
+
+test('Get url when endpointType:standalone and force:true', () => {
+  const params = createParams();
+  expect(
+    getExploreLongUrl(
+      params.formData,
+      'standalone',
+      params.allowOverflow,
+      params.extraSearch,
+      true,
+    ),
+  ).toBe(
+    '/superset/explore/?same=any-string&form_data=%7B%22datasource%22%3A%22datasource%22%2C%22viz_type%22%3A%22viz_type%22%7D&force=1&standalone=1',
   );
 });
 
@@ -88,5 +103,32 @@ test('Get url when endpointType:results and allowOverflow:false', () => {
     getExploreLongUrl(params.formData, 'results', false, params.extraSearch),
   ).toBe(
     '/superset/explore_json/?same=any-string&form_data=%7B%22datasource%22%3A%22datasource%22%2C%22viz_type%22%3A%22viz_type%22%7D',
+  );
+});
+
+test('Get url from a dashboard', () => {
+  const formData = {
+    ...createParams().formData,
+    // these params should get filtered out
+    extra_form_data: {
+      filters: {
+        col: 'foo',
+        op: 'IN',
+        val: ['bar'],
+      },
+    },
+    dataMask: {
+      'NATIVE_FILTER-bqEoUsEPe': {
+        id: 'NATIVE_FILTER-bqEoUsEPe',
+        lots: 'of other stuff here too',
+      },
+    },
+    url_params: {
+      native_filters: '(blah)',
+      standalone: true,
+    },
+  };
+  expect(getExploreUrlFromDashboard(formData)).toBe(
+    '/superset/explore/?form_data=%7B%22datasource%22%3A%22datasource%22%2C%22viz_type%22%3A%22viz_type%22%2C%22extra_form_data%22%3A%7B%22filters%22%3A%7B%22col%22%3A%22foo%22%2C%22op%22%3A%22IN%22%2C%22val%22%3A%5B%22bar%22%5D%7D%7D%7D',
   );
 });
