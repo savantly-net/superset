@@ -117,7 +117,6 @@ const all_columns: typeof sharedControls.groupby = {
         : [],
   }),
   visibility: isRawMode,
-  resetOnHide: false,
 };
 
 const dnd_all_columns: typeof sharedControls.groupby = {
@@ -141,7 +140,6 @@ const dnd_all_columns: typeof sharedControls.groupby = {
     return newState;
   },
   visibility: isRawMode,
-  resetOnHide: false,
 };
 
 const percent_metrics: typeof sharedControls.metrics = {
@@ -152,7 +150,6 @@ const percent_metrics: typeof sharedControls.metrics = {
   ),
   multi: true,
   visibility: isAggMode,
-  resetOnHide: false,
   mapStateToProps: ({ datasource, controls }, controlState) => ({
     columns: datasource?.columns || [],
     savedMetrics: datasource?.metrics || [],
@@ -193,7 +190,6 @@ const config: ControlPanelConfig = {
             name: 'groupby',
             override: {
               visibility: isAggMode,
-              resetOnHide: false,
               mapStateToProps: (
                 state: ControlPanelState,
                 controlState: ControlState,
@@ -224,7 +220,6 @@ const config: ControlPanelConfig = {
             override: {
               validators: [],
               visibility: isAggMode,
-              resetOnHide: false,
               mapStateToProps: (
                 { controls, datasource, form_data }: ControlPanelState,
                 controlState: ControlState,
@@ -268,7 +263,6 @@ const config: ControlPanelConfig = {
             name: 'timeseries_limit_metric',
             override: {
               visibility: isAggMode,
-              resetOnHide: false,
             },
           },
           {
@@ -283,7 +277,6 @@ const config: ControlPanelConfig = {
                 choices: datasource?.order_by_choices || [],
               }),
               visibility: isRawMode,
-              resetOnHide: false,
             },
           },
         ],
@@ -336,7 +329,6 @@ const config: ControlPanelConfig = {
               ),
               default: false,
               visibility: isAggMode,
-              resetOnHide: false,
             },
           },
           {
@@ -347,7 +339,6 @@ const config: ControlPanelConfig = {
               default: true,
               description: t('Whether to sort descending or ascending'),
               visibility: isAggMode,
-              resetOnHide: false,
             },
           },
         ],
@@ -362,7 +353,6 @@ const config: ControlPanelConfig = {
                 'Show total aggregations of selected metrics. Note that row limit does not apply to the result.',
               ),
               visibility: isAggMode,
-              resetOnHide: false,
             },
           },
         ],

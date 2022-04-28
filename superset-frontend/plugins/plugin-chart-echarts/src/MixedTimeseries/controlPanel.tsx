@@ -126,7 +126,7 @@ function createCustomizeSection(
   controlSuffix: string,
 ): ControlSetRow[] {
   return [
-    [<div className="section-header">{label}</div>],
+    [<h1 className="section-header">{label}</h1>],
     [
       {
         name: `seriesType${controlSuffix}`,
@@ -296,7 +296,7 @@ const config: ControlPanelConfig = {
           },
         ],
         ...legendSection,
-        [<div className="section-header">{t('X Axis')}</div>],
+        [<h1 className="section-header">{t('X Axis')}</h1>],
         ['x_axis_time_format'],
         [
           {
@@ -320,7 +320,7 @@ const config: ControlPanelConfig = {
         ],
         ...richTooltipSection,
         // eslint-disable-next-line react/jsx-key
-        [<div className="section-header">{t('Y Axis')}</div>],
+        [<h1 className="section-header">{t('Y Axis')}</h1>],
         [
           {
             name: 'minorSplitLine',

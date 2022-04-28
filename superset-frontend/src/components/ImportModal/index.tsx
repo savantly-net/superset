@@ -25,7 +25,6 @@ import Modal from 'src/components/Modal';
 import { Upload } from 'src/components';
 import { useImportResource } from 'src/views/CRUD/hooks';
 import { ImportResourceName } from 'src/views/CRUD/types';
-import ErrorAlert from './ErrorAlert';
 
 const HelperMessage = styled.div`
   display: block;
@@ -117,6 +116,7 @@ const ImportModelsModal: FunctionComponent<ImportModelsModalProps> = ({
   resourceLabel,
   passwordsNeededMessage,
   confirmOverwriteMessage,
+  addDangerToast,
   onModelImport,
   show,
   onHide,
@@ -130,7 +130,6 @@ const ImportModelsModal: FunctionComponent<ImportModelsModalProps> = ({
   const [confirmedOverwrite, setConfirmedOverwrite] = useState<boolean>(false);
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [importingModel, setImportingModel] = useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = useState<string>();
 
   const clearModal = () => {
     setFileList([]);
@@ -139,11 +138,11 @@ const ImportModelsModal: FunctionComponent<ImportModelsModalProps> = ({
     setNeedsOverwriteConfirm(false);
     setConfirmedOverwrite(false);
     setImportingModel(false);
-    setErrorMessage('');
   };
 
   const handleErrorMsg = (msg: string) => {
-    setErrorMessage(msg);
+    clearModal();
+    addDangerToast(msg);
   };
 
   const {
@@ -295,12 +294,10 @@ const ImportModelsModal: FunctionComponent<ImportModelsModalProps> = ({
           onRemove={removeFile}
           // upload is handled by hook
           customRequest={() => {}}
-          disabled={importingModel}
         >
           <Button loading={importingModel}>Select file</Button>
         </Upload>
       </StyledInputContainer>
-      {errorMessage && <ErrorAlert errorMessage={errorMessage} />}
       {renderPasswordFields()}
       {renderOverwriteConfirmation()}
     </Modal>

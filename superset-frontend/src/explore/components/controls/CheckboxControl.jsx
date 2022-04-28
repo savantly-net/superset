@@ -18,7 +18,6 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { styled, css } from '@superset-ui/core';
 import ControlHeader from '../ControlHeader';
 import Checkbox from '../../../components/Checkbox';
 
@@ -33,16 +32,7 @@ const defaultProps = {
   onChange: () => {},
 };
 
-const CheckBoxControlWrapper = styled.div`
-  ${({ theme }) => css`
-    .ControlHeader label {
-      color: ${theme.colors.grayscale.dark1};
-    }
-    span[role='checkbox'] {
-      padding-right: ${theme.gridUnit * 2}px;
-    }
-  `}
-`;
+const checkboxStyle = { paddingRight: '5px' };
 
 export default class CheckboxControl extends React.Component {
   onChange() {
@@ -53,6 +43,7 @@ export default class CheckboxControl extends React.Component {
     return (
       <Checkbox
         onChange={this.onChange.bind(this)}
+        style={checkboxStyle}
         checked={!!this.props.value}
       />
     );
@@ -61,13 +52,11 @@ export default class CheckboxControl extends React.Component {
   render() {
     if (this.props.label) {
       return (
-        <CheckBoxControlWrapper>
-          <ControlHeader
-            {...this.props}
-            leftNode={this.renderCheckbox()}
-            onClick={this.onChange.bind(this)}
-          />
-        </CheckBoxControlWrapper>
+        <ControlHeader
+          {...this.props}
+          leftNode={this.renderCheckbox()}
+          onClick={this.onChange.bind(this)}
+        />
       );
     }
     return this.renderCheckbox();

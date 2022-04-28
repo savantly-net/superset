@@ -9,5 +9,9 @@
   "keywords": [],
   "license": "Apache-2.0",
   "author": "Apache",
-  "dependencies": {}
+  "dependencies": {},
+  "engines": {
+    "node": "^16.9.1",
+    "npm": "^7.5.4"
+  }
 }

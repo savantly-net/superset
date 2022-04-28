@@ -27,10 +27,9 @@ import {
 import {
   rollingWindowOperator,
   timeCompareOperator,
-  isTimeComparison,
+  isValidTimeCompare,
   pivotOperator,
   resampleOperator,
-  renameOperator,
   contributionOperator,
   prophetOperator,
   timeComparePivotOperator,
@@ -61,7 +60,7 @@ export default function buildQuery(formData: QueryFormData) {
           2015-03-01      318.0         0.0
 
      */
-    const pivotOperatorInRuntime: PostProcessingPivot = isTimeComparison(
+    const pivotOperatorInRuntime: PostProcessingPivot = isValidTimeCompare(
       formData,
       baseQueryObject,
     )
@@ -80,7 +79,7 @@ export default function buildQuery(formData: QueryFormData) {
         is_timeseries,
         // todo: move `normalizeOrderBy to extractQueryFields`
         orderby: normalizeOrderBy(baseQueryObject).orderby,
-        time_offsets: isTimeComparison(formData, baseQueryObject)
+        time_offsets: isValidTimeCompare(formData, baseQueryObject)
           ? formData.time_compare
           : [],
         /* Note that:
@@ -92,12 +91,7 @@ export default function buildQuery(formData: QueryFormData) {
           rollingWindowOperator(formData, baseQueryObject),
           timeCompareOperator(formData, baseQueryObject),
           resampleOperator(formData, baseQueryObject),
-          renameOperator(formData, {
-            ...baseQueryObject,
-            ...{ is_timeseries },
-          }),
           flattenOperator(formData, baseQueryObject),
-          // todo: move contribution and prophet before flatten
           contributionOperator(formData, baseQueryObject),
           prophetOperator(formData, baseQueryObject),
         ],

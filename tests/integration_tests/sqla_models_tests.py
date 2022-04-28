@@ -455,8 +455,7 @@ class TestDatabaseModel(SupersetTestCase):
 
         # make sure the columns have been mapped properly
         assert len(table.columns) == 4
-        table.fetch_metadata(commit=False)
-
+        table.fetch_metadata()
         # assert that the removed column has been dropped and
         # the physical and calculated columns are present
         assert {col.column_name for col in table.columns} == {
@@ -473,8 +472,6 @@ class TestDatabaseModel(SupersetTestCase):
         assert cols["mycase"].expression == ""
         assert VIRTUAL_TABLE_STRING_TYPES[backend].match(cols["mycase"].type)
         assert cols["expr"].expression == "case when 1 then 1 else 0 end"
-
-        db.session.delete(table)
 
     @patch("superset.models.core.Database.db_engine_spec", BigQueryEngineSpec)
     def test_labels_expected_on_mutated_query(self):

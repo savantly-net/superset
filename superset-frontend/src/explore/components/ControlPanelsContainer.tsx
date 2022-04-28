@@ -60,7 +60,7 @@ import { Tooltip } from 'src/components/Tooltip';
 
 import ControlRow from './ControlRow';
 import Control from './Control';
-import { ExploreAlert } from './ExploreAlert';
+import { ControlPanelAlert } from './ControlPanelAlert';
 import { RunQueryButton } from './RunQueryButton';
 
 export type ControlPanelsContainerProps = {
@@ -92,7 +92,6 @@ const actionButtonsContainerStyles = (theme: SupersetTheme) => css`
   flex-direction: column;
   align-items: center;
   padding: ${theme.gridUnit * 4}px;
-  z-index: 999;
   background: linear-gradient(
     transparent,
     ${theme.colors.grayscale.light5} ${theme.opacity.mediumLight}
@@ -149,21 +148,6 @@ const ControlPanelsTabs = styled(Tabs)`
     }
     .ant-tabs-content-holder {
       padding-top: ${theme.gridUnit * 4}px;
-    }
-
-    .ant-collapse-ghost > .ant-collapse-item {
-      &:not(:last-child) {
-        border-bottom: 1px solid ${theme.colors.grayscale.light3};
-      }
-
-      & > .ant-collapse-header {
-        font-size: ${theme.typography.sizes.s}px;
-      }
-
-      & > .ant-collapse-content > .ant-collapse-content-box {
-        padding-bottom: 0;
-        font-size: ${theme.typography.sizes.s}px;
-      }
     }
   `}
 `;
@@ -403,7 +387,6 @@ export const ControlPanelsContainer = (props: ControlPanelsContainerProps) => {
 
           &:last-child {
             padding-bottom: ${theme.gridUnit * 16}px;
-            border-bottom: 0;
           }
 
           .panel-body {
@@ -460,7 +443,7 @@ export const ControlPanelsContainer = (props: ControlPanelsContainerProps) => {
   const DatasourceAlert = useCallback(
     () =>
       hasControlsTransferred ? (
-        <ExploreAlert
+        <ControlPanelAlert
           title={t('Keep control settings?')}
           bodyText={t(
             "You've changed datasets. Any controls with data (columns, metrics) that match this new dataset have been retained.",
@@ -472,7 +455,7 @@ export const ControlPanelsContainer = (props: ControlPanelsContainerProps) => {
           type="info"
         />
       ) : (
-        <ExploreAlert
+        <ControlPanelAlert
           title={t('No form settings were maintained')}
           bodyText={t(
             'We were unable to carry over any controls when switching to this new dataset.',
@@ -531,6 +514,7 @@ export const ControlPanelsContainer = (props: ControlPanelsContainerProps) => {
       >
         <Tabs.TabPane key="query" tab={dataTabTitle}>
           <Collapse
+            bordered
             defaultActiveKey={expandedQuerySections}
             expandIconPosition="right"
             ghost
@@ -543,6 +527,7 @@ export const ControlPanelsContainer = (props: ControlPanelsContainerProps) => {
         {showCustomizeTab && (
           <Tabs.TabPane key="display" tab={t('Customize')}>
             <Collapse
+              bordered
               defaultActiveKey={expandedCustomizeSections}
               expandIconPosition="right"
               ghost

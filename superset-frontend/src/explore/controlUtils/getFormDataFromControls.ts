@@ -22,10 +22,13 @@ import { ControlStateMapping } from '@superset-ui/chart-controls';
 export function getFormDataFromControls(
   controlsState: ControlStateMapping,
 ): QueryFormData {
-  const formData = {};
+  const formData: QueryFormData = {
+    viz_type: 'table',
+    datasource: '',
+  };
   Object.keys(controlsState).forEach(controlName => {
     const control = controlsState[controlName];
     formData[controlName] = control.value;
   });
-  return formData as QueryFormData;
+  return formData;
 }

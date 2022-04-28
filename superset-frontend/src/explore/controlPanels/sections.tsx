@@ -132,7 +132,7 @@ export const NVD3TimeSeries: ControlPanelSectionConfig[] = [
         'of query results',
     ),
     controlSetRows: [
-      [<div className="section-header">{t('Rolling window')}</div>],
+      [<h1 className="section-header">{t('Rolling window')}</h1>],
       [
         {
           name: 'rolling_type',
@@ -181,7 +181,7 @@ export const NVD3TimeSeries: ControlPanelSectionConfig[] = [
           },
         },
       ],
-      [<div className="section-header">{t('Time comparison')}</div>],
+      [<h1 className="section-header">{t('Time comparison')}</h1>],
       [
         {
           name: 'time_compare',
@@ -230,7 +230,9 @@ export const NVD3TimeSeries: ControlPanelSectionConfig[] = [
           },
         },
       ],
-      [<div className="section-header">{t('Resample')}</div>],
+      [<h1 className="section-header">{t('Python functions')}</h1>],
+      // eslint-disable-next-line jsx-a11y/heading-has-content
+      [<h2 className="section-header">pandas.resample</h2>],
       [
         {
           name: 'resample_rule',

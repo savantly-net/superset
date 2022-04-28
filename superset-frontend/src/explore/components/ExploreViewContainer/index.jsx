@@ -22,7 +22,7 @@ import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { styled, t, css, useTheme, logging } from '@superset-ui/core';
-import { debounce, pick } from 'lodash';
+import { debounce } from 'lodash';
 import { Resizable } from 're-resizable';
 import { useChangeEffect } from 'src/hooks/useChangeEffect';
 import { usePluginContext } from 'src/components/DynamicPlugins';
@@ -63,6 +63,8 @@ import ConnectedExploreChartHeader from '../ExploreChartHeader';
 
 const propTypes = {
   ...ExploreChartPanel.propTypes,
+  height: PropTypes.string,
+  width: PropTypes.string,
   actions: PropTypes.object.isRequired,
   datasource_type: PropTypes.string.isRequired,
   dashboardId: PropTypes.number,
@@ -133,7 +135,6 @@ const ExplorePanelContainer = styled.div`
       flex: 1;
       min-width: ${theme.gridUnit * 128}px;
       border-left: 1px solid ${theme.colors.grayscale.light2};
-      padding: 0 ${theme.gridUnit * 4}px;
       .panel {
         margin-bottom: 0;
       }
@@ -170,6 +171,23 @@ const ExplorePanelContainer = styled.div`
     }
   `};
 `;
+
+const getWindowSize = () => ({
+  height: window.innerHeight,
+  width: window.innerWidth,
+});
+
+function useWindowSize({ delayMs = 250 } = {}) {
+  const [size, setSize] = useState(getWindowSize());
+
+  useEffect(() => {
+    const onWindowResize = debounce(() => setSize(getWindowSize()), delayMs);
+    window.addEventListener('resize', onWindowResize);
+    return () => window.removeEventListener('resize', onWindowResize);
+  }, []);
+
+  return size;
+}
 
 const updateHistory = debounce(
   async (formData, datasetId, isReplace, standalone, force, title, tabId) => {
@@ -228,6 +246,7 @@ function ExploreViewContainer(props) {
   const [lastQueriedControls, setLastQueriedControls] = useState(
     props.controls,
   );
+  const windowSize = useWindowSize();
 
   const [showingModal, setShowingModal] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -235,6 +254,11 @@ function ExploreViewContainer(props) {
   const tabId = useTabId();
 
   const theme = useTheme();
+  const width = `${windowSize.width}px`;
+  const navHeight = props.standalone ? 0 : 120;
+  const height = props.forcedHeight
+    ? `${props.forcedHeight}px`
+    : `${windowSize.height - navHeight}px`;
 
   const defaultSidebarsWidth = {
     controls_width: 320,
@@ -381,33 +405,18 @@ function ExploreViewContainer(props) {
     }
   }, []);
 
-  const reRenderChart = useCallback(
-    controlsChanged => {
-      const newQueryFormData = controlsChanged
-        ? {
-            ...props.chart.latestQueryFormData,
-            ...getFormDataFromControls(pick(props.controls, controlsChanged)),
-          }
-        : getFormDataFromControls(props.controls);
-      props.actions.updateQueryFormData(newQueryFormData, props.chart.id);
-      props.actions.renderTriggered(new Date().getTime(), props.chart.id);
-      addHistory();
-    },
-    [
-      addHistory,
-      props.actions,
+  const reRenderChart = () => {
+    props.actions.updateQueryFormData(
+      getFormDataFromControls(props.controls),
       props.chart.id,
-      props.chart.latestQueryFormData,
-      props.controls,
-    ],
-  );
+    );
+    props.actions.renderTriggered(new Date().getTime(), props.chart.id);
+    addHistory();
+  };
 
   // effect to run when controls change
   useEffect(() => {
-    if (
-      previousControls &&
-      props.chart.latestQueryFormData.viz_type === props.controls.viz_type.value
-    ) {
+    if (previousControls) {
       if (
         props.controls.datasource &&
         (previousControls.datasource == null ||
@@ -427,11 +436,11 @@ function ExploreViewContainer(props) {
       );
 
       // this should also be handled by the actions that are actually changing the controls
-      const displayControlsChanged = changedControlKeys.filter(
+      const hasDisplayControlChanged = changedControlKeys.some(
         key => props.controls[key].renderTrigger,
       );
-      if (displayControlsChanged.length > 0) {
-        reRenderChart(displayControlsChanged);
+      if (hasDisplayControlChanged) {
+        reRenderChart();
       }
     }
   }, [props.controls, props.ownState]);
@@ -506,9 +515,11 @@ function ExploreViewContainer(props) {
   function renderChartContainer() {
     return (
       <ExploreChartPanel
+        width={width}
+        height={height}
         {...props}
         errorMessage={errorMessage}
-        chartIsStale={chartIsStale}
+        refreshOverlayVisible={chartIsStale}
         onQuery={onQuery}
       />
     );

@@ -76,7 +76,7 @@ const config: ControlPanelConfig = {
         ['color_scheme'],
         ...funnelLegendSection,
         // eslint-disable-next-line react/jsx-key
-        [<div className="section-header">{t('Labels')}</div>],
+        [<h1 className="section-header">{t('Labels')}</h1>],
         [
           {
             name: 'label_type',

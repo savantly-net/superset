@@ -38,7 +38,7 @@ from sqlalchemy_utils import UUIDType
 
 from superset import db
 from superset.migrations.versions.b56500de1855_add_uuid_column_to_import_mixin import (
-    assign_uuids,
+    add_uuids,
     models,
     update_dashboards,
 )
@@ -73,7 +73,7 @@ def upgrade():
                     default=uuid4,
                 ),
             )
-        assign_uuids(model, session)
+        add_uuids(model, table_name, session)
 
         # add uniqueness constraint
         with op.batch_alter_table(table_name) as batch_op:

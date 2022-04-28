@@ -62,7 +62,7 @@ const config: ControlPanelConfig = {
       expanded: true,
       controlSetRows: [
         ['color_scheme'],
-        [<div className="section-header">{t('Labels')}</div>],
+        [<h1 className="section-header">{t('Labels')}</h1>],
         [
           {
             name: 'show_labels',

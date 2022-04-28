@@ -75,7 +75,7 @@ const config: ControlPanelConfig = {
       label: t('Chart Options'),
       expanded: true,
       controlSetRows: [
-        [<div className="section-header">{t('General')}</div>],
+        [<h1 className="section-header">{t('General')}</h1>],
         [
           {
             name: 'min_val',
@@ -197,7 +197,7 @@ const config: ControlPanelConfig = {
             },
           },
         ],
-        [<div className="section-header">{t('Axis')}</div>],
+        [<h1 className="section-header">{t('Axis')}</h1>],
         [
           {
             name: 'show_axis_tick',
@@ -236,7 +236,7 @@ const config: ControlPanelConfig = {
             },
           },
         ],
-        [<div className="section-header">{t('Progress')}</div>],
+        [<h1 className="section-header">{t('Progress')}</h1>],
         [
           {
             name: 'show_progress',
@@ -277,7 +277,7 @@ const config: ControlPanelConfig = {
             },
           },
         ],
-        [<div className="section-header">{t('Intervals')}</div>],
+        [<h1 className="section-header">{t('Intervals')}</h1>],
         [
           {
             name: 'intervals',

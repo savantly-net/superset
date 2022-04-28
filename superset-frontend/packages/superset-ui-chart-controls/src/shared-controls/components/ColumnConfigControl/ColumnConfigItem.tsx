@@ -48,10 +48,8 @@ export default React.memo(function ColumnConfigItem({
     >
       <div
         css={{
-          display: 'flex',
-          alignItems: 'center',
           cursor: 'pointer',
-          padding: `${gridUnit}px ${2 * gridUnit}px`,
+          padding: `${1.5 * gridUnit}px ${2 * gridUnit}px`,
           borderBottom: `1px solid ${colors.grayscale.light2}`,
           position: 'relative',
           paddingRight: caretWidth,
