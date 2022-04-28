@@ -76,11 +76,7 @@ def test_validate_parameters_catalog(
 
     assert errors == [
         SupersetError(
-            message=(
-                "The URL could not be identified. Please check for typos "
-                "and make sure that ‘Type of Google Sheets allowed’ "
-                "selection matches the input."
-            ),
+            message="URL could not be identified",
             error_type=SupersetErrorType.TABLE_DOES_NOT_EXIST_ERROR,
             level=ErrorLevel.WARNING,
             extra={
@@ -101,11 +97,7 @@ def test_validate_parameters_catalog(
             },
         ),
         SupersetError(
-            message=(
-                "The URL could not be identified. Please check for typos "
-                "and make sure that ‘Type of Google Sheets allowed’ "
-                "selection matches the input."
-            ),
+            message="URL could not be identified",
             error_type=SupersetErrorType.TABLE_DOES_NOT_EXIST_ERROR,
             level=ErrorLevel.WARNING,
             extra={
@@ -166,11 +158,7 @@ def test_validate_parameters_catalog_and_credentials(
     errors = GSheetsEngineSpec.validate_parameters(parameters)  # ignore: type
     assert errors == [
         SupersetError(
-            message=(
-                "The URL could not be identified. Please check for typos "
-                "and make sure that ‘Type of Google Sheets allowed’ "
-                "selection matches the input."
-            ),
+            message="URL could not be identified",
             error_type=SupersetErrorType.TABLE_DOES_NOT_EXIST_ERROR,
             level=ErrorLevel.WARNING,
             extra={

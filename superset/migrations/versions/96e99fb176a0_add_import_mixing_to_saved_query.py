@@ -32,7 +32,9 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy_utils import UUIDType
 
 from superset import db
-from superset.migrations.shared.utils import assign_uuids
+from superset.migrations.versions.b56500de1855_add_uuid_column_to_import_mixin import (
+    add_uuids,
+)
 
 # revision identifiers, used by Alembic.
 revision = "96e99fb176a0"
@@ -73,7 +75,7 @@ def upgrade():
         # Ignore column update errors so that we can run upgrade multiple times
         pass
 
-    assign_uuids(SavedQuery, session)
+    add_uuids(SavedQuery, "saved_query", session)
 
     try:
         # Add uniqueness constraint

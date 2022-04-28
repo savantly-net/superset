@@ -164,7 +164,7 @@ const config: ControlPanelConfig = {
       expanded: false,
       controlSetRows: [
         // eslint-disable-next-line react/jsx-key
-        [<div className="section-header">{t('Rolling Window')}</div>],
+        [<h1 className="section-header">{t('Rolling Window')}</h1>],
         [
           {
             name: 'rolling_type',
@@ -217,7 +217,8 @@ const config: ControlPanelConfig = {
             },
           },
         ],
-        [<div className="section-header">{t('Resample')}</div>],
+        // eslint-disable-next-line react/jsx-key
+        [<h1 className="section-header">{t('Resample')}</h1>],
         [
           {
             name: 'resample_rule',

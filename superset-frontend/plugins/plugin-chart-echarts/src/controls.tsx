@@ -94,7 +94,7 @@ const legendOrientationControl: ControlSetItem = {
 };
 
 export const legendSection: ControlSetRow[] = [
-  [<div className="section-header">{t('Legend')}</div>],
+  [<h1 className="section-header">{t('Legend')}</h1>],
   [showLegendControl],
   [legendTypeControl],
   [legendOrientationControl],
@@ -219,7 +219,7 @@ const tooltipSortByMetricControl: ControlSetItem = {
 };
 
 export const richTooltipSection: ControlSetRow[] = [
-  [<div className="section-header">{t('Tooltip')}</div>],
+  [<h1 className="section-header">{t('Tooltip')}</h1>],
   [richTooltipControl],
   [tooltipSortByMetricControl],
   [tooltipTimeFormatControl],

@@ -14,7 +14,7 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-"""merge point
+"""empty message
 
 Revision ID: 9d8a8d575284
 Revises: ('8b841273bec3', 'b0d0249074e4')

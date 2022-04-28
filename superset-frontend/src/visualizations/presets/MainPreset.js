@@ -77,8 +77,8 @@ import {
   TimeGrainFilterPlugin,
   GroupByFilterPlugin,
 } from 'src/filters/components/';
-import { PivotTableChartPlugin as PivotTableChartPluginV2 } from '@superset-ui/plugin-chart-pivot-table';
 import CalendarRangePlugin from '@nischalbharat/calendar-range-plugin';
+import { PivotTableChartPlugin as PivotTableChartPluginV2 } from '@superset-ui/plugin-chart-pivot-table';
 import FilterBoxChartPlugin from '../FilterBox/FilterBoxChartPlugin';
 import TimeTableChartPlugin from '../TimeTable';
 

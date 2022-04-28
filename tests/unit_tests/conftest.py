@@ -17,7 +17,7 @@
 # pylint: disable=redefined-outer-name, import-outside-toplevel
 
 import importlib
-from typing import Any, Callable, Iterator
+from typing import Any, Iterator
 
 import pytest
 from pytest_mock import MockFixture
@@ -31,33 +31,25 @@ from superset.initialization import SupersetAppInitializer
 
 
 @pytest.fixture
-def get_session(mocker: MockFixture) -> Callable[[], Session]:
+def session(mocker: MockFixture) -> Iterator[Session]:
     """
     Create an in-memory SQLite session to test models.
     """
     engine = create_engine("sqlite://")
+    Session_ = sessionmaker(bind=engine)  # pylint: disable=invalid-name
+    in_memory_session = Session_()
 
-    def get_session():
-        Session_ = sessionmaker(bind=engine)  # pylint: disable=invalid-name
-        in_memory_session = Session_()
+    # flask calls session.remove()
+    in_memory_session.remove = lambda: None
 
-        # flask calls session.remove()
-        in_memory_session.remove = lambda: None
+    # patch session
+    mocker.patch(
+        "superset.security.SupersetSecurityManager.get_session",
+        return_value=in_memory_session,
+    )
+    mocker.patch("superset.db.session", in_memory_session)
 
-        # patch session
-        mocker.patch(
-            "superset.security.SupersetSecurityManager.get_session",
-            return_value=in_memory_session,
-        )
-        mocker.patch("superset.db.session", in_memory_session)
-        return in_memory_session
-
-    return get_session
-
-
-@pytest.fixture
-def session(get_session) -> Iterator[Session]:
-    yield get_session()
+    yield in_memory_session
 
 
 @pytest.fixture(scope="module")

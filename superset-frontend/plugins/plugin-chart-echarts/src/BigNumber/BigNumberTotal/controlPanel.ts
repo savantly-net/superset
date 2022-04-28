@@ -34,7 +34,7 @@ export default {
       controlSetRows: [['metric'], ['adhoc_filters']],
     },
     {
-      label: t('Display settings'),
+      label: t('Options'),
       expanded: true,
       tabOverride: 'data',
       controlSetRows: [

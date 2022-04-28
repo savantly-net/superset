@@ -169,7 +169,10 @@ class DatabaseRestApi(BaseSupersetModelRestApi):
 
     edit_columns = add_columns
 
-    search_filters = {"allow_file_upload": [DatabaseUploadEnabledFilter]}
+    search_filters = {
+        "allow_file_upload": [DatabaseUploadEnabledFilter],
+        "expose_in_sqllab": [DatabaseFilter],
+    }
 
     list_select_columns = list_columns + ["extra", "sqlalchemy_uri", "password"]
     order_columns = [

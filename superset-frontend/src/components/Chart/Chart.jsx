@@ -22,6 +22,7 @@ import { styled, logging, t, ensureIsArray } from '@superset-ui/core';
 
 import { isFeatureEnabled, FeatureFlag } from 'src/featureFlags';
 import { PLACEHOLDER_DATASOURCE } from 'src/dashboard/constants';
+import Button from 'src/components/Button';
 import Loading from 'src/components/Loading';
 import { EmptyStateBig } from 'src/components/EmptyState';
 import ErrorBoundary from 'src/components/ErrorBoundary';
@@ -31,7 +32,6 @@ import { getUrlParam } from 'src/utils/urlUtils';
 import { ResourceStatus } from 'src/hooks/apiResources/apiResources';
 import ChartRenderer from './ChartRenderer';
 import { ChartErrorMessage } from './ChartErrorMessage';
-import { getChartRequiredFieldsMissingMessage } from '../../utils/getChartRequiredFieldsMissingMessage';
 
 const propTypes = {
   annotationData: PropTypes.object,
@@ -64,7 +64,7 @@ const propTypes = {
   chartStackTrace: PropTypes.string,
   queriesResponse: PropTypes.arrayOf(PropTypes.object),
   triggerQuery: PropTypes.bool,
-  chartIsStale: PropTypes.bool,
+  refreshOverlayVisible: PropTypes.bool,
   errorMessage: PropTypes.node,
   // dashboard callbacks
   addFilter: PropTypes.func,
@@ -108,8 +108,20 @@ const Styles = styled.div`
   }
 `;
 
+const RefreshOverlayWrapper = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
 const MonospaceDiv = styled.div`
   font-family: ${({ theme }) => theme.typography.families.monospace};
+  white-space: pre;
   word-break: break-word;
   overflow-x: auto;
   white-space: pre-wrap;
@@ -243,23 +255,34 @@ class Chart extends React.PureComponent {
       chartAlert,
       chartStatus,
       errorMessage,
-      chartIsStale,
+      onQuery,
+      refreshOverlayVisible,
       queriesResponse = [],
       isDeactivatedViz = false,
       width,
     } = this.props;
 
     const isLoading = chartStatus === 'loading';
+    const isFaded = refreshOverlayVisible && !errorMessage;
     this.renderContainerStartTime = Logger.getTimestamp();
     if (chartStatus === 'failed') {
       return queriesResponse.map(item => this.renderErrorMessage(item));
     }
 
-    if (errorMessage && ensureIsArray(queriesResponse).length === 0) {
+    if (errorMessage) {
+      const description = isFeatureEnabled(
+        FeatureFlag.ENABLE_EXPLORE_DRAG_AND_DROP,
+      )
+        ? t(
+            'Drag and drop values into highlighted field(s) on the left control panel and run query',
+          )
+        : t(
+            'Select values in highlighted field(s) on the left control panel and run query',
+          );
       return (
         <EmptyStateBig
           title={t('Add required control values to preview chart')}
-          description={getChartRequiredFieldsMissingMessage(true)}
+          description={description}
           image="chart.svg"
         />
       );
@@ -268,24 +291,15 @@ class Chart extends React.PureComponent {
     if (
       !isLoading &&
       !chartAlert &&
-      !errorMessage &&
-      chartIsStale &&
+      isFaded &&
       ensureIsArray(queriesResponse).length === 0
     ) {
       return (
         <EmptyStateBig
           title={t('Your chart is ready to go!')}
-          description={
-            <span>
-              {t(
-                'Click on "Create chart" button in the control panel on the left to preview a visualization or',
-              )}{' '}
-              <span role="button" tabIndex={0} onClick={this.props.onQuery}>
-                {t('click here')}
-              </span>
-              .
-            </span>
-          }
+          description={t(
+            'Click on "Create chart" button in the control panel on the left to preview a visualization',
+          )}
           image="chart.svg"
         />
       );
@@ -303,13 +317,25 @@ class Chart extends React.PureComponent {
           height={height}
           width={width}
         >
-          <div className="slice_container" data-test="slice-container">
+          <div
+            className={`slice_container ${isFaded ? ' faded' : ''}`}
+            data-test="slice-container"
+          >
             <ChartRenderer
               {...this.props}
               source={this.props.dashboardId ? 'dashboard' : 'explore'}
               data-test={this.props.vizType}
             />
           </div>
+
+          {!isLoading && !chartAlert && isFaded && (
+            <RefreshOverlayWrapper>
+              <Button onClick={onQuery} buttonStyle="primary">
+                {t('Run query')}
+              </Button>
+            </RefreshOverlayWrapper>
+          )}
+
           {isLoading && !isDeactivatedViz && <Loading />}
         </Styles>
       </ErrorBoundary>

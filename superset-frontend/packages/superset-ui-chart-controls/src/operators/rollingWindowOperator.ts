@@ -24,14 +24,14 @@ import {
   PostProcessingRolling,
   RollingType,
 } from '@superset-ui/core';
-import { getMetricOffsetsMap, isTimeComparison } from './utils';
+import { getMetricOffsetsMap, isValidTimeCompare } from './utils';
 import { PostProcessingFactory } from './types';
 
 export const rollingWindowOperator: PostProcessingFactory<
   PostProcessingRolling | PostProcessingCum
 > = (formData, queryObject) => {
   let columns: (string | undefined)[];
-  if (isTimeComparison(formData, queryObject)) {
+  if (isValidTimeCompare(formData, queryObject)) {
     const metricsMap = getMetricOffsetsMap(formData, queryObject);
     columns = [
       ...Array.from(metricsMap.values()),

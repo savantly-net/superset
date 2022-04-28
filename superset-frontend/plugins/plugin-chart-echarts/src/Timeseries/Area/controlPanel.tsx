@@ -178,7 +178,7 @@ const config: ControlPanelConfig = {
           },
         ],
         ...legendSection,
-        [<div className="section-header">{t('X Axis')}</div>],
+        [<h1 className="section-header">{t('X Axis')}</h1>],
         [
           {
             name: 'x_axis_time_format',
@@ -213,7 +213,7 @@ const config: ControlPanelConfig = {
         ],
         ...richTooltipSection,
         // eslint-disable-next-line react/jsx-key
-        [<div className="section-header">{t('Y Axis')}</div>],
+        [<h1 className="section-header">{t('Y Axis')}</h1>],
         ['y_axis_format'],
         [
           {

@@ -90,7 +90,7 @@ const config: ControlPanelConfig = {
         ],
         ...legendSection,
         // eslint-disable-next-line react/jsx-key
-        [<div className="section-header">{t('Labels')}</div>],
+        [<h1 className="section-header">{t('Labels')}</h1>],
         [
           {
             name: 'label_type',
@@ -196,7 +196,7 @@ const config: ControlPanelConfig = {
           },
         ],
         // eslint-disable-next-line react/jsx-key
-        [<div className="section-header">{t('Pie shape')}</div>],
+        [<h1 className="section-header">{t('Pie shape')}</h1>],
         [
           {
             name: 'outerRadius',

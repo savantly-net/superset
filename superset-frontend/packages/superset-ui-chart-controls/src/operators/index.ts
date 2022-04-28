@@ -23,7 +23,6 @@ export { timeComparePivotOperator } from './timeComparePivotOperator';
 export { sortOperator } from './sortOperator';
 export { pivotOperator } from './pivotOperator';
 export { resampleOperator } from './resampleOperator';
-export { renameOperator } from './renameOperator';
 export { contributionOperator } from './contributionOperator';
 export { prophetOperator } from './prophetOperator';
 export { boxplotOperator } from './boxplotOperator';

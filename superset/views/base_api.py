@@ -39,7 +39,6 @@ from superset.sql_lab import Query as SqllabQuery
 from superset.stats_logger import BaseStatsLogger
 from superset.superset_typing import FlaskResponse
 from superset.utils.core import time_function
-from superset.views.base import handle_api_exception
 
 logger = logging.getLogger(__name__)
 get_related_schema = {
@@ -387,7 +386,6 @@ class BaseSupersetModelRestApi(ModelRestApi):
         object_ref=False,
         log_to_statsd=False,
     )
-    @handle_api_exception
     def info_headless(self, **kwargs: Any) -> Response:
         """
         Add statsd metrics to builtin FAB _info endpoint
@@ -401,7 +399,6 @@ class BaseSupersetModelRestApi(ModelRestApi):
         object_ref=False,
         log_to_statsd=False,
     )
-    @handle_api_exception
     def get_headless(self, pk: int, **kwargs: Any) -> Response:
         """
         Add statsd metrics to builtin FAB GET endpoint
@@ -415,7 +412,6 @@ class BaseSupersetModelRestApi(ModelRestApi):
         object_ref=False,
         log_to_statsd=False,
     )
-    @handle_api_exception
     def get_list_headless(self, **kwargs: Any) -> Response:
         """
         Add statsd metrics to builtin FAB GET list endpoint
@@ -429,7 +425,6 @@ class BaseSupersetModelRestApi(ModelRestApi):
         object_ref=False,
         log_to_statsd=False,
     )
-    @handle_api_exception
     def post_headless(self) -> Response:
         """
         Add statsd metrics to builtin FAB POST endpoint
@@ -443,7 +438,6 @@ class BaseSupersetModelRestApi(ModelRestApi):
         object_ref=False,
         log_to_statsd=False,
     )
-    @handle_api_exception
     def put_headless(self, pk: int) -> Response:
         """
         Add statsd metrics to builtin FAB PUT endpoint
@@ -457,7 +451,6 @@ class BaseSupersetModelRestApi(ModelRestApi):
         object_ref=False,
         log_to_statsd=False,
     )
-    @handle_api_exception
     def delete_headless(self, pk: int) -> Response:
         """
         Add statsd metrics to builtin FAB DELETE endpoint
@@ -471,7 +464,6 @@ class BaseSupersetModelRestApi(ModelRestApi):
     @safe
     @statsd_metrics
     @rison(get_related_schema)
-    @handle_api_exception
     def related(self, column_name: str, **kwargs: Any) -> FlaskResponse:
         """Get related fields data
         ---
@@ -550,7 +542,6 @@ class BaseSupersetModelRestApi(ModelRestApi):
     @safe
     @statsd_metrics
     @rison(get_related_schema)
-    @handle_api_exception
     def distinct(self, column_name: str, **kwargs: Any) -> FlaskResponse:
         """Get distinct values from field data
         ---
